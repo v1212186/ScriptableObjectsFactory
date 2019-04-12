@@ -1,0 +1,16 @@
+{
+  "name": "com.dre0dru.scriptableobjectsfactory",
+  "displayName": "Scriptable Objects Factory",
+  "version": "1.0.0",
+  "unity": "2019.1.0f1",
+  "description": "Scriptable Objects Factory for Unity",
+  "keywords": [
+    "scriptalbe objects",
+    "factory"
+  ],
+  "category": "Tools"
+  "repository": {
+        "type": "git",
+        "url": "https://github.com/v1212186/ScriptableObjectsFactory.git"
+    }
+}
