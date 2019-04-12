@@ -8,7 +8,7 @@
     "scriptalbe objects",
     "factory"
   ],
-  "category": "Tools"
+  "category": "Tools",
   "repository": {
         "type": "git",
         "url": "https://github.com/v1212186/ScriptableObjectsFactory.git"
