@@ -4,10 +4,7 @@
 
 .unity-box {
     flex: 1 0 0;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    margin-right: 10px;
-    margin-left: 10px;
+    margin: 10px;
     padding:2px;
 }
 
@@ -29,4 +26,9 @@
     margin-bottom:10px;
     margin-left:10px;
     margin-right:10px;
+}
+
+.unity-toolbar-search-field{
+    max-width: 180px;
+    min-width: 120px;
 }

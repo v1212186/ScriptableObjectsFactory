@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEditor;
+using UnityEditor.Compilation;
 using UnityEditor.ProjectWindowCallback;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Assembly = System.Reflection.Assembly;
 using PopupWindow = UnityEngine.UIElements.PopupWindow;
 
-//TODO собственный элемент для холда типа СО и strings xml файл для названий
 namespace ScriptableObjectsFactory.Editor
 {
     internal class EndNameEdit : EndNameEditAction
@@ -20,13 +20,16 @@ namespace ScriptableObjectsFactory.Editor
                 AssetDatabase.GenerateUniqueAssetPath(_pathName));
         }
     }
-
+    
     public class ScriptableObjectsFactoryWindow : EditorWindow
     {
         private const string LayoutResourcePath = "ScriptableObjectsFactoryLayout";
         private const string StyleResourcePath = "ScriptableObjectsFactoryStyle";
-
-        ScrollView scriptalbeObjectsScrollView;
+        private const int WindowMinSizeX = 250;
+        private const int WindowMinSizeY = 185;
+        private const string WindowTitle = "Scriptable Objects Factory";
+        
+        private ScrollView scriptalbeObjectsScrollView;
 
         private string selectedAssembly;
 
@@ -36,14 +39,15 @@ namespace ScriptableObjectsFactory.Editor
 
         private bool isInitialized;
 
-        [MenuItem("Tools/Scriptable Objects Factory")]
+        [MenuItem("Tools/"+WindowTitle)]
         public static void ShowExample()
         {
-            ScriptableObjectsFactoryWindow window = GetWindow<ScriptableObjectsFactoryWindow>("Scriptable Objects Factory");
-            window.minSize = new Vector2(250, 300);
+            ScriptableObjectsFactoryWindow window =
+                GetWindow<ScriptableObjectsFactoryWindow>(WindowTitle);
+            window.minSize = new Vector2(WindowMinSizeX, WindowMinSizeY);
         }
 
-        public void OnEnable()
+        private void OnEnable()
         {
             scriptableObjects = new Dictionary<string, Type>();
             isInitialized = false;
@@ -62,11 +66,8 @@ namespace ScriptableObjectsFactory.Editor
 
         private void RegisterCallbacks(VisualElement _root)
         {
-            ToolbarSearchField toolbarSearchField = _root.Q<ToolbarSearchField>("toolbarSearch");
-            toolbarSearchField.RegisterValueChangedCallback(OnSearchTextChanged);
-
             PopupWindow popupWindow = _root.Q<PopupWindow>("popupWindow");
-            List<string> assemblyNames = AssemblyUtils.GetAssemblyNames(AssemblyUtils.GetPlayerAssemblies()).ToList();
+            List<string> assemblyNames = AssemblyUtils.GetAssemblyNames(AssemblyUtils.GetAssembliesByType(AssembliesType.Player)).ToList();
             PopupField<string> popupField = new PopupField<string>(assemblyNames, 0, OnEnumPopupSelected);
             popupWindow.Add(popupField);
 
@@ -78,23 +79,16 @@ namespace ScriptableObjectsFactory.Editor
 
         private void CreateLayoutManually(VisualElement _root)
         {
-            Toolbar toolbar = new Toolbar();
-            _root.Add(toolbar);
-
-            ToolbarSearchField searchField = new ToolbarSearchField();
-            toolbar.Add(searchField);
-            searchField.RegisterValueChangedCallback(OnSearchTextChanged);
-
             PopupWindow popupWindow = new PopupWindow();
             popupWindow.text = "Assemblies";
             _root.Add(popupWindow);
 
-            List<string> assemblyNames = AssemblyUtils.GetAssemblyNames(AssemblyUtils.GetPlayerAssemblies()).ToList();
+            List<string> assemblyNames = AssemblyUtils.GetAssemblyNames(AssemblyUtils.GetAssembliesByType(AssembliesType.Player)).ToList();
             PopupField<string> popupField = new PopupField<string>(assemblyNames, 0, OnEnumPopupSelected);
             popupWindow.Add(popupField);
 
             Box scriptalbeObjectsContainer = new Box();
-            scriptalbeObjectsScrollView = new ScrollView { showHorizontal = false };
+            scriptalbeObjectsScrollView = new ScrollView {showHorizontal = false};
             scriptalbeObjectsContainer.Add(scriptalbeObjectsScrollView);
             _root.Add(scriptalbeObjectsContainer);
 
@@ -109,7 +103,7 @@ namespace ScriptableObjectsFactory.Editor
                     marginRight = 10,
                 }
             };
-            Button button = new Button(CreateScriptableObject) { text = "Create scriptable object" };
+            Button button = new Button(CreateScriptableObject) {text = "Create scriptable object"};
             buttonContainer.Add(button);
             _root.Add(buttonContainer);
         }
@@ -118,7 +112,8 @@ namespace ScriptableObjectsFactory.Editor
         {
             scriptalbeObjectsScrollView.Clear();
             scriptableObjects.Clear();
-
+            selectedScriptableObject = null;
+            
             GetScriptableObjectsNames();
 
             foreach (string scriptableObjectsKey in scriptableObjects.Keys)
@@ -127,8 +122,13 @@ namespace ScriptableObjectsFactory.Editor
             }
         }
 
-        public void CreateScriptableObject()
+        private void CreateScriptableObject()
         {
+            if (string.IsNullOrEmpty(selectedScriptableObject) || !scriptableObjects.ContainsKey(selectedScriptableObject))
+            {
+                return;
+            }
+            
             var asset = ScriptableObject.CreateInstance(scriptableObjects[selectedScriptableObject]);
             ProjectWindowUtil.StartNameEditingIfProjectWindowExists(
                 asset.GetInstanceID(),
@@ -136,36 +136,31 @@ namespace ScriptableObjectsFactory.Editor
                 $"{scriptableObjects[selectedScriptableObject]}.asset",
                 AssetPreview.GetMiniThumbnail(asset),
                 null);
+
+            selectedScriptableObject = null;
         }
 
-        public VisualElement CreateScriptalbeObjectElement(string _name)
+        private VisualElement CreateScriptalbeObjectElement(string _name)
         {
-            Label task = new Label(_name) { focusable = true, name = _name };
-            task.AddManipulator(new Clickable(OnElementClick));
+            Label task = new Label(_name) {focusable = true, name = _name};
             task.AddToClassList("task");
 
             task.RegisterCallback<KeyDownEvent, string>(ConfirmButtonPress, task.name);
+            task.RegisterCallback<FocusInEvent, string>(OnElementFocusIn, task.name);
 
             return task;
         }
-
-        private void OnElementClick(EventBase _obj)
+        
+        private void OnElementFocusIn(FocusInEvent _focusEvent, string _scriptableObjectName)
         {
-            Label clickedLabel = _obj.target as Label;
-            if (clickedLabel == null)
-            {
-                Debug.LogError("Clicked on null label");
-                return;
-            }
-
-            selectedScriptableObject = clickedLabel.text;
+            selectedScriptableObject = _scriptableObjectName;
         }
 
-        public void ConfirmButtonPress(KeyDownEvent e, string scriptableObjectName)
+        private void ConfirmButtonPress(KeyDownEvent _keyDownEvent, string _scriptableObjectName)
         {
-            if (e.keyCode == KeyCode.Return)
+            if (_keyDownEvent.keyCode == KeyCode.Return)
             {
-                if (scriptableObjectName != null)
+                if (_scriptableObjectName != null)
                 {
                     CreateScriptableObject();
                 }
@@ -179,15 +174,11 @@ namespace ScriptableObjectsFactory.Editor
             {
                 RefreshScriptableObjectElements();
             }
+
             return _assemblyName;
         }
 
-        private void OnSearchTextChanged(ChangeEvent<string> evt)
-        {
-            Debug.Log(evt.newValue);
-        }
-
-        #region Scriptable objects
+        #region Assemblies
 
         private void GetScriptableObjectsNames()
         {
@@ -204,13 +195,12 @@ namespace ScriptableObjectsFactory.Editor
         private Type[] GetAllScriptableObjects(Assembly _assembly)
         {
             Type[] allScriptableObjects = (from t in _assembly.GetTypes()
-                                           where t.IsSubclassOf(typeof(ScriptableObject))
-                                           select t).ToArray();
+                where t.IsSubclassOf(typeof(ScriptableObject))
+                select t).ToArray();
 
             return allScriptableObjects;
         }
 
         #endregion
-
     }
 }

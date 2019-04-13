@@ -4,19 +4,14 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ui="UnityEngine.UIElements"
     xmlns:uie="UnityEditor.UIElements"
     xmlns:upm="UnityEditor.PackageManager.UI"
-    xmlns:sof="ScriptableObjectsFactory.Editor"
 
 xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
 xsi:schemaLocation="
                         UnityEngine.UIElements ../../../UIElementsSchema/UnityEngine.UIElements.xsd
                         UnityEditor.UIElements ../../../UIElementsSchema/UnityEditor.UIElements.xsd
                         UnityEditor.PackageManager.UI ../../../UIElementsSchema/UnityEditor.PackageManager.UI.xsd
-                        UnityEditor.PackageManager.UI ../../../UIElementsSchema/ScriptableObjectsFactory.Editor.xsd
 "
 >
-  <uie:Toolbar>
-    <uie:ToolbarSearchField name="toolbarSearch"/>
-  </uie:Toolbar>
   <ui:PopupWindow text="Assemblies" name="popupWindow">
   </ui:PopupWindow>
   <ui:Box>
