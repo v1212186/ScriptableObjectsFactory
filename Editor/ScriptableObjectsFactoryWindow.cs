@@ -94,20 +94,8 @@ namespace ScriptableObjectsFactory.Editor
 
             RefreshScriptableObjectElements();
 
-            VisualElement buttonContainer = new VisualElement()
-            {
-                style =
-                {
-                    marginBottom = 10,
-                    marginLeft = 10,
-                    marginRight = 10,
-                    marginTop = 10,
-                    paddingBottom = 1,
-                    paddingLeft = 1,
-                    paddingRight = 1,
-                    paddingTop = 1,
-                }
-            };
+            VisualElement buttonContainer = new VisualElement();
+            buttonContainer.AddToClassList("buttonContainer");
             Button button = new Button(CreateScriptableObject) {text = "Create scriptable object"};
             buttonContainer.Add(button);
             _root.Add(buttonContainer);
