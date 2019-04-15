@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ui:UXML
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:ui="UnityEngine.UIElements"
-    xmlns:uie="UnityEditor.UIElements"
-    xmlns:upm="UnityEditor.PackageManager.UI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ui="UnityEngine.UIElements"
+  xmlns:uie="UnityEditor.UIElements"
+  xmlns:upm="UnityEditor.PackageManager.UI"
 
-xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
-xsi:schemaLocation="
+  xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+  xsi:schemaLocation="
                         UnityEngine.UIElements ../../../UIElementsSchema/UnityEngine.UIElements.xsd
                         UnityEditor.UIElements ../../../UIElementsSchema/UnityEditor.UIElements.xsd
                         UnityEditor.PackageManager.UI ../../../UIElementsSchema/UnityEditor.PackageManager.UI.xsd
-"
->
+">
   <ui:PopupWindow text="Assemblies" name="popupWindow">
   </ui:PopupWindow>
   <ui:Box>
-    <ui:ScrollView name="scrollView" show-horizontal-scroller="false" />
+    <ui:ScrollView name="scrollView" show-horizontal-scroller="false" show-vertical-scroller="true" />
   </ui:Box>
   <ui:VisualElement class="buttonContainer">
-    <ui:Button name="createButton" text="Create scriptable object"/>
+    <ui:Button name="createButton" text="Create scriptable object" />
   </ui:VisualElement>
 </ui:UXML>
