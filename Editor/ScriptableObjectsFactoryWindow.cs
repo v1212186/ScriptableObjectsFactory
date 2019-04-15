@@ -88,7 +88,7 @@ namespace ScriptableObjectsFactory.Editor
             popupWindow.Add(popupField);
 
             Box scriptalbeObjectsContainer = new Box();
-            scriptalbeObjectsScrollView = new ScrollView {showHorizontal = false};
+            scriptalbeObjectsScrollView = new ScrollView {showHorizontal = false, showVertical = true};
             scriptalbeObjectsContainer.Add(scriptalbeObjectsScrollView);
             _root.Add(scriptalbeObjectsContainer);
 
@@ -101,6 +101,11 @@ namespace ScriptableObjectsFactory.Editor
                     marginBottom = 10,
                     marginLeft = 10,
                     marginRight = 10,
+                    marginTop = 10,
+                    paddingBottom = 1,
+                    paddingLeft = 1,
+                    paddingRight = 1,
+                    paddingTop = 1,
                 }
             };
             Button button = new Button(CreateScriptableObject) {text = "Create scriptable object"};
